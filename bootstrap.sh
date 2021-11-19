@@ -12,6 +12,6 @@ externalId=$(head -c${1:-128} < /dev/urandom | shasum | awk '{print $1}')
 aws cloudformation create-stack \
 	--stack-name cyclic-management-role-global \
 	--capabilities CAPABILITY_NAMED_IAM \
-	--template-body file://account/bootstrap.yaml \
+	--template-body file://bootstrap.yaml \
 	--parameters ParameterKey=ExternalId,ParameterValue="$externalId" \
 	--region us-east-2
