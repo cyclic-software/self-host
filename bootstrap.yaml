@@ -1,0 +1,42 @@
+Description: This stack includes resources needed to deploy Cyclic Software Apps into this AWS environment
+Parameters:
+  ExternalId:
+    Description: A secret value used to have access to the management role created by this stack
+    Type: String
+
+
+Resources:
+  ManagementRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub cyclic-role-${AWS::AccountId}
+      Description: Cyclic software bootstrap role to manage deployment infrastructure
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Condition:
+              StringEquals:
+                sts:ExternalId:
+                  - !Ref ExternalId
+              ForAnyValue:StringLike:
+                aws:PrincipalOrgPaths:
+                  - o-5tcc3zscq0/*
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      MaxSessionDuration: 3600
+      Path: /cyclic/
+      Tags:
+      - Key: cyclic:cloudformation:region
+        Value: !Sub ${AWS::Region}
+      - Key: cyclic:cloudformation:stack-name
+        Value: !Sub ${AWS::StackName}
+      - Key: cyclic:cloudformation:stack-id
+        Value: !Sub ${AWS::StackId}
+
+Outputs:
+  RoleArn:
+    Description: Cyclic management role arn
+    Value: !GetAtt ManagementRole.Arn
